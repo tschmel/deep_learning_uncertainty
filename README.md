@@ -1,2 +1,8 @@
-# deep_learning_uncertainty
-Investigate uncertainty in different deep learning models. 
+# Uncertainty of CNN classification models 
+This repo is about showing the uncertainty of different models on different datasets. 
+
+There are different ways to 'measure' uncertainty. 
+Currently it is done by using Monte Carlo Dropout (MC Dropout). 
+
+
+

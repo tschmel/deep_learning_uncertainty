@@ -1,0 +1,11 @@
+dataset: mnist
+model: cnn
+feat_dim: 1
+img_size: 28
+learning_rate: 0.003
+weight_decay: 0.00005
+classes: 10
+epochs: 10
+batch_size: 2048
+val_freq: 1
+uncert_epochs: 10

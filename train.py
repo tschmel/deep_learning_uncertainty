@@ -1,5 +1,7 @@
 import argparse
 import yaml
+import logging
+import time
 from types import SimpleNamespace
 import torch
 import torch.nn as nn
@@ -8,9 +10,8 @@ from torch.utils.tensorboard import SummaryWriter
 import torchmetrics
 
 import load_datasets.MNIST
-import models.CNN
-from models import *
-from load_datasets import *
+import load_datasets.CIFAR10
+import load_datasets.FOOD101
 
 
 def get_parser():
@@ -24,18 +25,57 @@ def get_parser():
     return config
 
 
+def create_logger(args):
+    logger = logging.getLogger('training_logger')
+    logger.setLevel(logging.INFO)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
+    filename = 'train_' + args.dataset + '_' + args.model + '.log'
+    file_handler = logging.FileHandler('./logs/' + filename)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+    return logger
+
+
 def main():
     args = get_parser()
+    logger = create_logger(args)
+    logger.info('<<<<<<<<<<<<<<<<<<< START OF TRAINING >>>>>>>>>>>>>>>>>>>')
+    start_time = time.time()
     writer = SummaryWriter()
-    model = models.CNN.create_cnn_model(classes=args.classes).cuda()
+    if args.model == 'cnn':
+        from models.CNN import create_cnn_model as Model
+        logger.info('CNN model architecture selected')
+    elif args.model == 'mlp':
+        from models.MLP import create_mlp_model as Model
+        logger.info('MLP model architecture selected')
+    else:
+        logger.error('Model architecture not supported!')
+    model = Model(args).cuda()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
-    dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args.batch_size)
-    train(model, criterion, optimizer, writer, dl_train, dl_test, args)
-    torch.save(model.state_dict(), './model.pth')
+    if args.dataset == 'mnist':
+        logger.info('MNIST dataset selected')
+        dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args)
+    elif args.dataset == 'cifar10':
+        logger.info('CIFAR10 dataset selected')
+        dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args)
+    elif args.dataset == 'food101':
+        logger.info('FOOD101 dataset selected')
+        dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args)
+    else:
+        logger.error('Dataset not supported!')
+
+    train(model, criterion, optimizer, writer, dl_train, dl_test, args, logger)
+    save_path = './' + args.dataset + '_' + args.model + '_model.pth'
+    torch.save(model.state_dict(), save_path)
+    end_time = time.time()
+    logger.info(f"Training took {end_time - start_time:.2f} seconds. ")
+    logger.info('<<<<<<<<<<<<<<<<<<<< END OF TRAINING >>>>>>>>>>>>>>>>>>>>')
 
 
-def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args):
+def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):
     for epoch in range(args.epochs):
         model.train()
         total_loss = 0
@@ -55,13 +95,12 @@ def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args):
 
         writer.add_scalar('loss/train', total_loss / len(dl_train), epoch)
         writer.add_scalar('acc/train', acc / len(dl_train), epoch)
+        logger.info(f"Epoch {epoch + 1}/{args.epochs}, Loss: {total_loss / len(dl_train):.4f}, Accuracy: {acc / len(dl_train):.4f}")
         if (epoch + 1) % args.val_freq == 0:
-            validate(model=model, dl_test=dl_test, loss_fn=loss_fn, epoch=epoch, writer=writer, args=args)
-
-        print(f"Epoch {epoch + 1}/{args.epochs}, Loss: {total_loss / len(dl_train):.4f}, Accuracy: {acc / len(dl_train):.4f}")
+            validate(model=model, dl_test=dl_test, loss_fn=loss_fn, epoch=epoch, writer=writer, args=args, logger=logger)
 
 
-def validate(model, dl_test, loss_fn, epoch, writer, args):
+def validate(model, dl_test, loss_fn, epoch, writer, args, logger):
     model.eval()
     total_loss_val = 0
     total_acc_val = 0
@@ -76,6 +115,9 @@ def validate(model, dl_test, loss_fn, epoch, writer, args):
 
     writer.add_scalar('loss/val', total_loss_val / len(dl_test), epoch)
     writer.add_scalar('acc/val', total_acc_val / len(dl_test), epoch)
+    #logger.info('<<<<<<<<<<<<<<<<<<<< Validation Step >>>>>>>>>>>>>>>>>>>>')
+    #logger.info(f"Loss: {total_loss_val / len(dl_test):.4f}, Accuracy: {total_acc_val / len(dl_test):.4f}")
+    #logger.info('<<<<<<<<<<<<<<<<< End of Validation Step >>>>>>>>>>>>>>>>>')
 
 
 if __name__ == '__main__':

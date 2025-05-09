@@ -1,3 +1,4 @@
+import os
 import argparse
 import yaml
 import logging
@@ -65,12 +66,19 @@ def main():
     elif args.model == 'resnet-152':
         from models.ResNet import create_resnet_152_model as Model
         logger.info('ResNet-152 model architecture selected')
+    elif args.model == 'u-net':
+        from models.U_Net import create_u_net_model as Model
+        logger.info('U-Net model architecture selected')
     elif args.model == 'mlp':
         from models.MLP import create_mlp_model as Model
         logger.info('MLP model architecture selected')
     else:
         logger.error('Model architecture not supported!')
     model = Model(args).cuda()
+    if args.resume:
+        if os.path.isfile(args.resume):
+            model.load_state_dict(torch.load(args.resume, weights_only=True))
+            logger.info(f'Loaded model from {args.resume} to resume training. ')
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     if args.dataset == 'mnist':

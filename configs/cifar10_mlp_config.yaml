@@ -10,3 +10,4 @@ batch_size: 1024
 val_freq: 1
 uncert_epochs: 10
 uncert_batchsize: 512
+resume:

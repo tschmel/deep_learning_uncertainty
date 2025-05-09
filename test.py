@@ -41,23 +41,32 @@ def main():
     if args.model == 'cnn':
         from models.CNN import create_cnn_model as Model
         logger.info('CNN model architecture selected')
+    elif args.model == 'larger_cnn':
+        from models.Larger_CNN import create_larger_cnn_model as Model
+        logger.info('Larger_CNN model architecture selected')
+    elif args.model == 'resnet-18':
+        from models.ResNet import create_resnet_18_model as Model
+        logger.info('ResNet-18 model architecture selected')
+    elif args.model == 'resnet-34':
+        from models.ResNet import create_resnet_34_model as Model
+        logger.info('ResNet-34 model architecture selected')
     elif args.model == 'mlp':
         from models.MLP import create_mlp_model as Model
         logger.info('MLP model architecture selected')
     else:
         logger.error('Model architecture not supported!')
     model = Model(args).cuda()
-    load_path = './' + args.dataset + '_' + args.model + '_model.pth'
+    load_path = './' + args.dataset + '_' + args.model + '_model_best.pth'
     model.load_state_dict(torch.load(load_path, weights_only=True))
     if args.dataset == 'mnist':
         logger.info('MNIST dataset selected')
-        dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args)
+        dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args.img_size, args.batch_size)
     elif args.dataset == 'cifar10':
         logger.info('CIFAR10 dataset selected')
-        dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args)
+        dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args.img_size, args.batch_size)
     elif args.dataset == 'food101':
         logger.info('FOOD101 dataset selected')
-        dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args)
+        dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args.img_size, args.batch_size)
     else:
         logger.error('Dataset not supported!')
     test(model, dl_test, args, logger)

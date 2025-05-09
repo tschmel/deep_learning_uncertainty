@@ -1,11 +1,12 @@
-dataset: mnist
-model: cnn
-feat_dim: 1
-img_size: 28
+dataset: food101 # [mnist, cifar10, food101]
+model: resnet-18
+feat_dim: 3
+img_size: 224
 learning_rate: 0.003
 weight_decay: 0.00005
-classes: 10
-epochs: 10
-batch_size: 1024
+classes: 101
+epochs: 50
+batch_size: 128
 val_freq: 1
-uncert_epochs: 10
+uncert_epochs: 30
+uncert_batchsize: 64

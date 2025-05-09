@@ -43,10 +43,28 @@ def main():
     logger = create_logger(args)
     logger.info('<<<<<<<<<<<<<<<<<<< START OF TRAINING >>>>>>>>>>>>>>>>>>>')
     start_time = time.time()
-    writer = SummaryWriter()
+    writer = SummaryWriter(log_dir='./logs', filename_suffix=args.dataset + '_' + args.model)
     if args.model == 'cnn':
         from models.CNN import create_cnn_model as Model
         logger.info('CNN model architecture selected')
+    elif args.model == 'larger_cnn':
+        from models.Larger_CNN import create_larger_cnn_model as Model
+        logger.info('Larger_CNN model architecture selected')
+    elif args.model == 'resnet-18':
+        from models.ResNet import create_resnet_18_model as Model
+        logger.info('ResNet-18 model architecture selected')
+    elif args.model == 'resnet-34':
+        from models.ResNet import create_resnet_34_model as Model
+        logger.info('ResNet-34 model architecture selected')
+    elif args.model == 'resnet-50':
+        from models.ResNet import create_resnet_50_model as Model
+        logger.info('ResNet-50 model architecture selected')
+    elif args.model == 'resnet-101':
+        from models.ResNet import create_resnet_101_model as Model
+        logger.info('ResNet-101 model architecture selected')
+    elif args.model == 'resnet-152':
+        from models.ResNet import create_resnet_152_model as Model
+        logger.info('ResNet-152 model architecture selected')
     elif args.model == 'mlp':
         from models.MLP import create_mlp_model as Model
         logger.info('MLP model architecture selected')
@@ -57,18 +75,18 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     if args.dataset == 'mnist':
         logger.info('MNIST dataset selected')
-        dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args)
+        dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args.img_size, args.batch_size)
     elif args.dataset == 'cifar10':
         logger.info('CIFAR10 dataset selected')
-        dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args)
+        dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args.img_size, args.batch_size)
     elif args.dataset == 'food101':
         logger.info('FOOD101 dataset selected')
-        dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args)
+        dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args.img_size, args.batch_size)
     else:
         logger.error('Dataset not supported!')
 
     train(model, criterion, optimizer, writer, dl_train, dl_test, args, logger)
-    save_path = './' + args.dataset + '_' + args.model + '_model.pth'
+    save_path = './' + args.dataset + '_' + args.model + '_model_last.pth'
     torch.save(model.state_dict(), save_path)
     end_time = time.time()
     logger.info(f"Training took {end_time - start_time:.2f} seconds. ")
@@ -80,6 +98,7 @@ def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):
         model.train()
         total_loss = 0
         acc = 0
+        best_val_acc = 0
 
         for images, labels in dl_train:
             images, labels = images.cuda(), labels.cuda()
@@ -96,8 +115,12 @@ def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):
         writer.add_scalar('loss/train', total_loss / len(dl_train), epoch)
         writer.add_scalar('acc/train', acc / len(dl_train), epoch)
         logger.info(f"Epoch {epoch + 1}/{args.epochs}, Loss: {total_loss / len(dl_train):.4f}, Accuracy: {acc / len(dl_train):.4f}")
-        if (epoch + 1) % args.val_freq == 0:
-            validate(model=model, dl_test=dl_test, loss_fn=loss_fn, epoch=epoch, writer=writer, args=args, logger=logger)
+        if epoch % args.val_freq == 0:
+            val_acc, val_loss = validate(model=model, dl_test=dl_test, loss_fn=loss_fn, epoch=epoch, writer=writer, args=args, logger=logger)
+            if val_acc >= best_val_acc:
+                best_val_acc = val_acc
+                save_path = './' + args.dataset + '_' + args.model + '_model_best.pth'
+                torch.save(model.state_dict(), save_path)
 
 
 def validate(model, dl_test, loss_fn, epoch, writer, args, logger):
@@ -118,6 +141,7 @@ def validate(model, dl_test, loss_fn, epoch, writer, args, logger):
     #logger.info('<<<<<<<<<<<<<<<<<<<< Validation Step >>>>>>>>>>>>>>>>>>>>')
     #logger.info(f"Loss: {total_loss_val / len(dl_test):.4f}, Accuracy: {total_acc_val / len(dl_test):.4f}")
     #logger.info('<<<<<<<<<<<<<<<<< End of Validation Step >>>>>>>>>>>>>>>>>')
+    return total_loss_val, total_acc_val
 
 
 if __name__ == '__main__':

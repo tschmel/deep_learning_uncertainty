@@ -11,8 +11,13 @@ from torch.utils.tensorboard import SummaryWriter
 import torchmetrics
 
 import load_datasets.MNIST
+import load_datasets.Fashion
 import load_datasets.CIFAR10
 import load_datasets.FOOD101
+import load_datasets.DTD
+
+from test import test
+from test import create_logger as test_logger
 
 
 def get_parser():
@@ -72,6 +77,9 @@ def main():
     elif args.model == 'mlp':
         from models.MLP import create_mlp_model as Model
         logger.info('MLP model architecture selected')
+    elif args.model == 'custom':
+        from models.Custom_Model import create_custom_model as Model
+        logger.info('Custom model architecture selected')
     else:
         logger.error('Model architecture not supported!')
     model = Model(args).cuda()
@@ -84,12 +92,18 @@ def main():
     if args.dataset == 'mnist':
         logger.info('MNIST dataset selected')
         dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args.img_size, args.batch_size)
+    elif args.dataset == 'fashion_mnist':
+        logger.info('FashionMNIST dataset selected')
+        dl_train, dl_test = load_datasets.Fashion.create_fashion_mnist_dataset(args.img_size, args.batch_size)
     elif args.dataset == 'cifar10':
         logger.info('CIFAR10 dataset selected')
         dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args.img_size, args.batch_size)
     elif args.dataset == 'food101':
         logger.info('FOOD101 dataset selected')
         dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args.img_size, args.batch_size)
+    elif args.dataset == 'dtd':
+        logger.info('DTD dataset selected')
+        dl_train, dl_test = load_datasets.DTD.create_dtd_dataset(args.img_size, args.batch_size)
     else:
         logger.error('Dataset not supported!')
 
@@ -99,6 +113,7 @@ def main():
     end_time = time.time()
     logger.info(f"Training took {end_time - start_time:.2f} seconds. ")
     logger.info('<<<<<<<<<<<<<<<<<<<< END OF TRAINING >>>>>>>>>>>>>>>>>>>>')
+    test(model, dl_test, args, test_logger(args))
 
 
 def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):

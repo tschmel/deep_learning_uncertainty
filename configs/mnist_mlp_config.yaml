@@ -11,3 +11,4 @@ val_freq: 1
 uncert_epochs: 10
 uncert_batchsize: 4096
 resume:
+test_path:

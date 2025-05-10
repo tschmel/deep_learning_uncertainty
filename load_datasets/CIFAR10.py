@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 def create_cifar10_dataset(img_size, batch_size):
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((img_size, img_size)),
+        transforms.Resize((img_size, img_size)),  # original: 32x32
     ])
 
     # Load dataset

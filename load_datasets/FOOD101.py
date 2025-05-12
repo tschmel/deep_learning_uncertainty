@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 def food101(args, split):
     transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((args.img_size, args.img_size)),  # original: 28x28
+        transforms.Resize((args.img_size, args.img_size)),  # original: max 512x512
     ])
     dl = None
     if split == 'train':

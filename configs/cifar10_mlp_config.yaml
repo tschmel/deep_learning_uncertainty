@@ -6,10 +6,10 @@ learning_rate: 0.003
 weight_decay: 0.00005
 classes: 10
 epochs: 10
-train_batch_size: 1024
-test_batch_size: 2048
+train_batch_size: 16384
+test_batch_size: 8192
 val_freq: 1
 uncert_epochs: 30
-uncert_batch_size: 512
+uncert_batch_size: 8192
 resume:
 test_path: cifar10_mlp_model_best.pth

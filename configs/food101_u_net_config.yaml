@@ -7,9 +7,9 @@ weight_decay: 0.00005
 classes: 101
 epochs: 50
 train_batch_size: 16
-test_batch_size: 512
+test_batch_size: 128
 val_freq: 1
 uncert_epochs: 30
-uncert_batch_size: 64
+uncert_batch_size: 128
 resume:
 test_path: food101_u-net_model_best.pth

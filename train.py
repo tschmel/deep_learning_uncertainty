@@ -91,23 +91,33 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     if args.dataset == 'mnist':
         logger.info('MNIST dataset selected')
-        dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args.img_size, args.batch_size)
+        dl_train = load_datasets.MNIST.load_mnist_train_dataset(args)
+        dl_val = load_datasets.MNIST.load_mnist_test_dataset(args)
+        dl_test = load_datasets.MNIST.load_mnist_test_dataset(args)
     elif args.dataset == 'fashion_mnist':
         logger.info('FashionMNIST dataset selected')
-        dl_train, dl_test = load_datasets.Fashion.create_fashion_mnist_dataset(args.img_size, args.batch_size)
+        dl_train = load_datasets.Fashion.load_fashion_mnist_train_dataset(args)
+        dl_val = load_datasets.Fashion.load_fashion_mnist_test_dataset(args)
+        dl_test = load_datasets.Fashion.load_fashion_mnist_test_dataset(args)
     elif args.dataset == 'cifar10':
         logger.info('CIFAR10 dataset selected')
-        dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args.img_size, args.batch_size)
+        dl_train = load_datasets.CIFAR10.load_cifar10_train_dataset(args)
+        dl_val = load_datasets.CIFAR10.load_cifar10_test_dataset(args)
+        dl_test = load_datasets.CIFAR10.load_cifar10_test_dataset(args)
     elif args.dataset == 'food101':
         logger.info('FOOD101 dataset selected')
-        dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args.img_size, args.batch_size)
+        dl_train = load_datasets.FOOD101.load_food101_train_dataset(args)
+        dl_val = load_datasets.FOOD101.load_food101_test_dataset(args)
+        dl_test = load_datasets.FOOD101.load_food101_test_dataset(args)
     elif args.dataset == 'dtd':
         logger.info('DTD dataset selected')
-        dl_train, dl_test = load_datasets.DTD.create_dtd_dataset(args.img_size, args.batch_size)
+        dl_train = load_datasets.MNIST.load_mnist_train_dataset(args)
+        dl_val = load_datasets.DTD.load_dtd_val_dataset(args)
+        dl_test = load_datasets.DTD.load_dtd_test_dataset(args)
     else:
         logger.error('Dataset not supported!')
 
-    train(model, criterion, optimizer, writer, dl_train, dl_test, args, logger)
+    train(model, criterion, optimizer, writer, dl_train, dl_val, args, logger)
     save_path = './' + args.dataset + '_' + args.model + '_model_last.pth'
     torch.save(model.state_dict(), save_path)
     end_time = time.time()

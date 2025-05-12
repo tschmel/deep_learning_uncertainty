@@ -77,19 +77,19 @@ def main():
     model.load_state_dict(torch.load(load_path, weights_only=True))
     if args.dataset == 'mnist':
         logger.info('MNIST dataset selected')
-        dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args.img_size, args.batch_size)
+        dl_test = load_datasets.MNIST.load_mnist_test_dataset(args)
     elif args.dataset == 'fashion_mnist':
         logger.info('FashionMNIST dataset selected')
-        dl_train, dl_test = load_datasets.Fashion.create_fashion_mnist_dataset(args.img_size, args.batch_size)
+        dl_test = load_datasets.Fashion.load_fashion_mnist_test_dataset(args)
     elif args.dataset == 'cifar10':
         logger.info('CIFAR10 dataset selected')
-        dl_train, dl_test = load_datasets.CIFAR10.create_cifar10_dataset(args.img_size, args.batch_size)
+        dl_test = load_datasets.CIFAR10.load_cifar10_test_dataset(args)
     elif args.dataset == 'food101':
         logger.info('FOOD101 dataset selected')
-        dl_train, dl_test = load_datasets.FOOD101.create_food101_dataset(args.img_size, args.batch_size)
+        dl_test = load_datasets.FOOD101.load_food101_test_dataset(args)
     elif args.dataset == 'dtd':
         logger.info('DTD dataset selected')
-        dl_train, dl_test = load_datasets.DTD.create_dtd_dataset(args.img_size, args.batch_size)
+        dl_test = load_datasets.DTD.load_dtd_test_dataset(args)
     else:
         logger.error('Dataset not supported!')
     test(model, dl_test, args, logger)

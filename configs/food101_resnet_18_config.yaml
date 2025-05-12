@@ -6,9 +6,10 @@ learning_rate: 0.003
 weight_decay: 0.00005
 classes: 101
 epochs: 100
-batch_size: 128
+train_batch_size: 128
+test_batch_size: 1024
 val_freq: 1
 uncert_epochs: 30
-uncert_batchsize: 64
+uncert_batch_size: 1024
 resume:
-test_path:
+test_path: food101_resnet-18_model_best.pth

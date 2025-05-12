@@ -1,14 +1,15 @@
 dataset: food101
-model: larger_cnn
+model: cnn
 feat_dim: 3
 img_size: 224
 learning_rate: 0.003
 weight_decay: 0.00005
 classes: 101
 epochs: 30
-batch_size: 128
+train_batch_size: 128
+test_batch_size: 2048
 val_freq: 1
-uncert_epochs: 10
-uncert_batchsize: 64
+uncert_epochs: 30
+uncert_batch_size: 64
 resume:
-test_path:
+test_path: food101_cnn_model_best.pth

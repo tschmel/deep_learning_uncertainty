@@ -14,7 +14,7 @@ def dtd(args, split):
         dl = DataLoader(train_dataset, batch_size=args.train_batch_size, shuffle=True)
     elif split == 'val':
         val_dataset = torchvision.datasets.DTD(root='../datasets', split='val', transform=transform, download=True)
-        dl = DataLoader(val_dataset, batch_size=args.test_batch_size, shuffle=False)
+        dl = DataLoader(val_dataset, batch_size=args.train_batch_size, shuffle=False)
     elif split == 'test':
         test_dataset = torchvision.datasets.DTD(root='../datasets', split='test', transform=transform, download=True)
         dl = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False)

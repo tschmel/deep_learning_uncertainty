@@ -42,9 +42,9 @@ def main():
     args = get_parser()
     logger = create_logger(args)
     logger.info('<<<<<<<<<<<<<<<<<<< START OF UNCERTAINTY CALCULATION >>>>>>>>>>>>>>>>>>>')
-    if args.model == 'cnn':
-        from models.CNN import create_cnn_model as Model
-        logger.info('CNN model architecture selected')
+    if args.model == 'simple_cnn':
+        from models.Simple_CNN import create_simple_cnn_model as Model
+        logger.info('Simple CNN model architecture selected')
     elif args.model == 'larger_cnn':
         from models.Larger_CNN import create_larger_cnn_model as Model
         logger.info('Larger_CNN model architecture selected')
@@ -69,9 +69,9 @@ def main():
     elif args.model == 'mlp':
         from models.MLP import create_mlp_model as Model
         logger.info('MLP model architecture selected')
-    elif args.model == 'custom':
-        from models.Custom_Model import create_custom_model as Model
-        logger.info('Custom model architecture selected')
+    elif args.model == 'skip_cnn':
+        from models.Skip_CNN import skip_cnn_model as Model
+        logger.info('Skip CNN model architecture selected')
     else:
         logger.error('Model architecture not supported!')
     model = Model(args).cuda()
@@ -98,8 +98,11 @@ def main():
 
 
 def calculate_uncertainty(model, dl_test, args, logger):
-    model.eval()
     logger.info('Calculating uncertainty ')
+    model.eval()
+    for module in model.modules():
+        if isinstance(module, torch.nn.Dropout):
+            module.train()
 
     # Storage
     all_entropies = []

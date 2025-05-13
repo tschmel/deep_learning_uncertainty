@@ -1,9 +1,9 @@
 import torch.nn as nn
 
 
-class CustomBlock(nn.Module):
+class Skip_CNN_Block(nn.Module):
     def __init__(self, in_feat_dim, out_feat_dim):
-        super(CustomBlock, self).__init__()
+        super(Skip_CNN_Block, self).__init__()
         self.batch_norm1 = nn.BatchNorm2d(in_feat_dim)
         self.conv1 = nn.Conv2d(in_channels=in_feat_dim, out_channels=out_feat_dim, kernel_size=3, stride=2, padding=1)
         self.batch_norm2 = nn.BatchNorm2d(out_feat_dim)
@@ -20,12 +20,13 @@ class CustomBlock(nn.Module):
         return x
 
 
-class CustomModel(nn.Module):
+class Skip_CNN(nn.Module):
     def __init__(self, feat_dim, classes):
-        super(CustomModel, self).__init__()
+        super(Skip_CNN, self).__init__()
         self.extractor = nn.Sequential(
-            CustomBlock(in_feat_dim=feat_dim, out_feat_dim=64),
-            CustomBlock(in_feat_dim=64, out_feat_dim=128)
+            Skip_CNN_Block(in_feat_dim=feat_dim, out_feat_dim=32),
+            Skip_CNN_Block(in_feat_dim=32, out_feat_dim=64),
+            Skip_CNN_Block(in_feat_dim=64, out_feat_dim=128)
         )
         self.classification_head = nn.Sequential(
                 nn.AdaptiveAvgPool2d(1),
@@ -40,6 +41,6 @@ class CustomModel(nn.Module):
         return x
 
 
-def create_custom_model(args):
-    model = CustomModel(feat_dim=args.feat_dim, classes=args.classes)
+def skip_cnn_model(args):
+    model = Skip_CNN(feat_dim=args.feat_dim, classes=args.classes)
     return model

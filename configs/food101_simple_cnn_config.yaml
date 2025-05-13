@@ -1,10 +1,10 @@
-dataset: dtd # [mnist, cifar10, food101]
-model: custom
+dataset: food101
+model: simple_cnn
 feat_dim: 3
 img_size: 224
 learning_rate: 0.003
 weight_decay: 0.00005
-classes: 47
+classes: 101
 epochs: 30
 train_batch_size: 128
 test_batch_size: 2048
@@ -12,4 +12,4 @@ val_freq: 1
 uncert_epochs: 30
 uncert_batch_size: 64
 resume:
-test_path: dtd_resnet-18_model_best.pth
+test_path: food101_simple_cnn_model_best.pth

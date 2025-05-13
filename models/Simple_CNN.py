@@ -1,9 +1,9 @@
 import torch.nn as nn
 
 
-class CNN(nn.Module):
+class Simple_CNN(nn.Module):
     def __init__(self, feat_dim, img_size, classes):
-        super(CNN, self).__init__()
+        super(Simple_CNN, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=feat_dim, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
         self.conv3 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1)
@@ -26,6 +26,6 @@ class CNN(nn.Module):
         return x
 
 
-def create_cnn_model(args):
-    model = CNN(feat_dim=args.feat_dim, img_size=int(args.img_size), classes=args.classes)
+def create_simple_cnn_model(args):
+    model = Simple_CNN(feat_dim=args.feat_dim, img_size=int(args.img_size), classes=args.classes)
     return model

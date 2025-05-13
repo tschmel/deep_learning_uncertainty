@@ -70,7 +70,7 @@ def main():
         from models.MLP import create_mlp_model as Model
         logger.info('MLP model architecture selected')
     elif args.model == 'skip_cnn':
-        from models.Skip_CNN import skip_cnn_model as Model
+        from models.Skip_CNN import create_skip_cnn_model as Model
         logger.info('Skip CNN model architecture selected')
     else:
         logger.error('Model architecture not supported!')

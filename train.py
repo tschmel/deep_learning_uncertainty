@@ -78,15 +78,17 @@ def main():
         from models.MLP import create_mlp_model as Model
         logger.info('MLP model architecture selected')
     elif args.model == 'skip_cnn':
-        from models.Skip_CNN import skip_cnn_model as Model
+        from models.Skip_CNN import create_skip_cnn_model as Model
         logger.info('Skip CNN model architecture selected')
     else:
         logger.error('Model architecture not supported!')
     model = Model(args).cuda()
     if args.resume:
-        if os.path.isfile(args.resume):
-            model.load_state_dict(torch.load(args.resume, weights_only=True))
-            logger.info(f'Loaded model from {args.resume} to resume training. ')
+        state_dict = torch.load(args.resume)
+        filtered_state_dict = {k: v for k, v in state_dict.items() if not k.startswith("classification_head.3")}
+        model.load_state_dict(filtered_state_dict, strict=False)
+        logger.info(f'Loaded model from {args.resume} to resume training. ')
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
     if args.dataset == 'mnist':

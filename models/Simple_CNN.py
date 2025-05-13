@@ -10,19 +10,18 @@ class Simple_CNN(nn.Module):
         self.batch_norm1 = nn.BatchNorm2d(num_features=feat_dim)
         self.batch_norm2 = nn.BatchNorm2d(num_features=32)
         self.batch_norm3 = nn.BatchNorm2d(num_features=64)
-        self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
-        self.flatten = nn.Flatten()
-        self.dropout1 = nn.Dropout(p=0.5)
-        self.linear = nn.Linear(in_features=int(128 * img_size/2 * img_size/2), out_features=classes)
+        self.classification_head = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=128, out_features=classes)
+        )
 
     def forward(self, x):
         x = nn.functional.relu(self.conv1(self.batch_norm1(x)))
         x = nn.functional.relu(self.conv2(self.batch_norm2(x)))
         x = nn.functional.relu(self.conv3(self.batch_norm3(x)))
-        x = self.pool(x)
-        x = self.flatten(x)
-        x = self.dropout1(x)
-        x = self.linear(x)
+        x = self.classification_head(x)
         return x
 
 

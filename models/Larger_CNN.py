@@ -24,10 +24,12 @@ class Larger_CNN(nn.Module):
         self.pool4 = nn.AvgPool2d(kernel_size=2, stride=2)
         self.pool5 = nn.AvgPool2d(kernel_size=2, stride=2)
         self.dropout1 = nn.Dropout(p=0.3)
-        self.dropout2 = nn.Dropout(p=0.5)
-        self.adapt_pool1 = nn.AdaptiveAvgPool2d(1)
-        self.flatten = nn.Flatten()
-        self.linear = nn.Linear(in_features=512, out_features=classes)
+        self.classification_head = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Dropout(p=0.5),
+            nn.Linear(in_features=128, out_features=classes)
+        )
 
     def forward(self, x):
         x = nn.functional.relu(self.conv1(self.batch_norm1(x)))
@@ -37,10 +39,7 @@ class Larger_CNN(nn.Module):
         x = self.pool4(nn.functional.relu(self.conv5(self.batch_norm5(x))))
         x = self.pool5(nn.functional.relu(self.conv6(self.batch_norm6(x))))
         x = self.dropout1(nn.functional.relu(self.conv7(self.batch_norm7(x))))
-        x = self.adapt_pool1(x)
-        x = self.flatten(x)
-        x = self.dropout2(x)
-        x = self.linear(x)
+        x = self.classification_head(x)
         return x
 
 

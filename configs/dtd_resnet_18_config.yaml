@@ -7,9 +7,9 @@ weight_decay: 0.00005
 classes: 47
 epochs: 30
 train_batch_size: 128
-test_batch_size: 1024
+test_batch_size: 512
 val_freq: 1
 uncert_epochs: 30
-uncert_batch_size: 1024
+uncert_batch_size: 512
 resume:
 test_path: dtd_resnet-18_model_best.pth

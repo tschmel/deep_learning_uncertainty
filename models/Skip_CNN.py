@@ -31,7 +31,7 @@ class Skip_CNN(nn.Module):
         self.classification_head = nn.Sequential(
                 nn.AdaptiveAvgPool2d(1),
                 nn.Flatten(),
-                nn.Dropout(p=0.5),
+                nn.Dropout(p=0.4),
                 nn.Linear(in_features=128, out_features=classes)
             )
 
@@ -41,6 +41,6 @@ class Skip_CNN(nn.Module):
         return x
 
 
-def skip_cnn_model(args):
+def create_skip_cnn_model(args):
     model = Skip_CNN(feat_dim=args.feat_dim, classes=args.classes)
     return model

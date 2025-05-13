@@ -1,5 +1,8 @@
+import os
 import argparse
 import yaml
+import logging
+import time
 from types import SimpleNamespace
 import torch
 import torch.nn as nn
@@ -8,9 +11,13 @@ from torch.utils.tensorboard import SummaryWriter
 import torchmetrics
 
 import load_datasets.MNIST
-import models.CNN
-from models import *
-from load_datasets import *
+import load_datasets.Fashion
+import load_datasets.CIFAR10
+import load_datasets.FOOD101
+import load_datasets.DTD
+
+from test import test
+from test import create_logger as test_logger
 
 
 def get_parser():
@@ -24,22 +31,107 @@ def get_parser():
     return config
 
 
+def create_logger(args):
+    logger = logging.getLogger('training_logger')
+    logger.setLevel(logging.INFO)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
+    filename = 'train_' + args.dataset + '_' + args.model + '.log'
+    file_handler = logging.FileHandler('./logs/' + filename)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+    return logger
+
+
 def main():
     args = get_parser()
-    writer = SummaryWriter()
-    model = models.CNN.create_cnn_model(classes=args.classes).cuda()
+    logger = create_logger(args)
+    logger.info('<<<<<<<<<<<<<<<<<<< START OF TRAINING >>>>>>>>>>>>>>>>>>>')
+    start_time = time.time()
+    writer = SummaryWriter(log_dir='./logs', filename_suffix=args.dataset + '_' + args.model)
+    if args.model == 'simple_cnn':
+        from models.Simple_CNN import create_simple_cnn_model as Model
+        logger.info('Simple CNN model architecture selected')
+    elif args.model == 'larger_cnn':
+        from models.Larger_CNN import create_larger_cnn_model as Model
+        logger.info('Larger_CNN model architecture selected')
+    elif args.model == 'resnet-18':
+        from models.ResNet import create_resnet_18_model as Model
+        logger.info('ResNet-18 model architecture selected')
+    elif args.model == 'resnet-34':
+        from models.ResNet import create_resnet_34_model as Model
+        logger.info('ResNet-34 model architecture selected')
+    elif args.model == 'resnet-50':
+        from models.ResNet import create_resnet_50_model as Model
+        logger.info('ResNet-50 model architecture selected')
+    elif args.model == 'resnet-101':
+        from models.ResNet import create_resnet_101_model as Model
+        logger.info('ResNet-101 model architecture selected')
+    elif args.model == 'resnet-152':
+        from models.ResNet import create_resnet_152_model as Model
+        logger.info('ResNet-152 model architecture selected')
+    elif args.model == 'u-net':
+        from models.U_Net import create_u_net_model as Model
+        logger.info('U-Net model architecture selected')
+    elif args.model == 'mlp':
+        from models.MLP import create_mlp_model as Model
+        logger.info('MLP model architecture selected')
+    elif args.model == 'skip_cnn':
+        from models.Skip_CNN import skip_cnn_model as Model
+        logger.info('Skip CNN model architecture selected')
+    else:
+        logger.error('Model architecture not supported!')
+    model = Model(args).cuda()
+    if args.resume:
+        if os.path.isfile(args.resume):
+            model.load_state_dict(torch.load(args.resume, weights_only=True))
+            logger.info(f'Loaded model from {args.resume} to resume training. ')
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
-    dl_train, dl_test = load_datasets.MNIST.create_mnist_dataset(args.batch_size)
-    train(model, criterion, optimizer, writer, dl_train, dl_test, args)
-    torch.save(model.state_dict(), './model.pth')
+    if args.dataset == 'mnist':
+        logger.info('MNIST dataset selected')
+        dl_train = load_datasets.MNIST.load_mnist_train_dataset(args)
+        dl_val = load_datasets.MNIST.load_mnist_test_dataset(args)
+        dl_test = load_datasets.MNIST.load_mnist_test_dataset(args)
+    elif args.dataset == 'fashion_mnist':
+        logger.info('FashionMNIST dataset selected')
+        dl_train = load_datasets.Fashion.load_fashion_mnist_train_dataset(args)
+        dl_val = load_datasets.Fashion.load_fashion_mnist_test_dataset(args)
+        dl_test = load_datasets.Fashion.load_fashion_mnist_test_dataset(args)
+    elif args.dataset == 'cifar10':
+        logger.info('CIFAR10 dataset selected')
+        dl_train = load_datasets.CIFAR10.load_cifar10_train_dataset(args)
+        dl_val = load_datasets.CIFAR10.load_cifar10_test_dataset(args)
+        dl_test = load_datasets.CIFAR10.load_cifar10_test_dataset(args)
+    elif args.dataset == 'food101':
+        logger.info('FOOD101 dataset selected')
+        dl_train = load_datasets.FOOD101.load_food101_train_dataset(args)
+        dl_val = load_datasets.FOOD101.load_food101_test_dataset(args)
+        dl_test = load_datasets.FOOD101.load_food101_test_dataset(args)
+    elif args.dataset == 'dtd':
+        logger.info('DTD dataset selected')
+        dl_train = load_datasets.DTD.load_dtd_train_dataset(args)
+        dl_val = load_datasets.DTD.load_dtd_val_dataset(args)
+        dl_test = load_datasets.DTD.load_dtd_test_dataset(args)
+    else:
+        logger.error('Dataset not supported!')
+
+    train(model, criterion, optimizer, writer, dl_train, dl_val, args, logger)
+    save_path = './' + args.dataset + '_' + args.model + '_model_last.pth'
+    torch.save(model.state_dict(), save_path)
+    end_time = time.time()
+    logger.info(f"Training took {end_time - start_time:.2f} seconds. ")
+    logger.info('<<<<<<<<<<<<<<<<<<<< END OF TRAINING >>>>>>>>>>>>>>>>>>>>')
+    test(model, dl_test, args, test_logger(args))
 
 
-def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args):
+def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):
     for epoch in range(args.epochs):
         model.train()
         total_loss = 0
         acc = 0
+        best_val_acc = 0
 
         for images, labels in dl_train:
             images, labels = images.cuda(), labels.cuda()
@@ -55,13 +147,16 @@ def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args):
 
         writer.add_scalar('loss/train', total_loss / len(dl_train), epoch)
         writer.add_scalar('acc/train', acc / len(dl_train), epoch)
-        if (epoch + 1) % args.val_freq == 0:
-            validate(model=model, dl_test=dl_test, loss_fn=loss_fn, epoch=epoch, writer=writer, args=args)
+        logger.info(f"Epoch {epoch + 1}/{args.epochs}, Loss: {total_loss / len(dl_train):.4f}, Accuracy: {acc / len(dl_train):.4f}")
+        if epoch % args.val_freq == 0:
+            val_acc, val_loss = validate(model=model, dl_test=dl_test, loss_fn=loss_fn, epoch=epoch, writer=writer, args=args, logger=logger)
+            if val_acc >= best_val_acc:
+                best_val_acc = val_acc
+                save_path = './' + args.dataset + '_' + args.model + '_model_best.pth'
+                torch.save(model.state_dict(), save_path)
 
-        print(f"Epoch {epoch + 1}/{args.epochs}, Loss: {total_loss / len(dl_train):.4f}, Accuracy: {acc / len(dl_train):.4f}")
 
-
-def validate(model, dl_test, loss_fn, epoch, writer, args):
+def validate(model, dl_test, loss_fn, epoch, writer, args, logger):
     model.eval()
     total_loss_val = 0
     total_acc_val = 0
@@ -76,6 +171,10 @@ def validate(model, dl_test, loss_fn, epoch, writer, args):
 
     writer.add_scalar('loss/val', total_loss_val / len(dl_test), epoch)
     writer.add_scalar('acc/val', total_acc_val / len(dl_test), epoch)
+    #logger.info('<<<<<<<<<<<<<<<<<<<< Validation Step >>>>>>>>>>>>>>>>>>>>')
+    #logger.info(f"Loss: {total_loss_val / len(dl_test):.4f}, Accuracy: {total_acc_val / len(dl_test):.4f}")
+    #logger.info('<<<<<<<<<<<<<<<<< End of Validation Step >>>>>>>>>>>>>>>>>')
+    return total_loss_val, total_acc_val
 
 
 if __name__ == '__main__':

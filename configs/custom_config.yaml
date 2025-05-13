@@ -1,0 +1,15 @@
+dataset: food101 # [mnist, cifar10, food101]
+model: skip_cnn
+feat_dim: 3
+img_size: 224
+learning_rate: 0.003
+weight_decay: 0.00005
+classes: 101
+epochs: 10
+train_batch_size: 128
+test_batch_size: 4096
+val_freq: 1
+uncert_epochs: 30
+uncert_batch_size: 512
+resume:
+test_path: food101_skip_cnn_model_best.pth

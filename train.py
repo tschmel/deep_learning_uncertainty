@@ -129,11 +129,11 @@ def main():
 
 
 def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):
+    best_val_acc = 0
     for epoch in range(args.epochs):
         model.train()
         total_loss = 0
         acc = 0
-        best_val_acc = 0
 
         for images, labels in dl_train:
             images, labels = images.cuda(), labels.cuda()
@@ -171,12 +171,14 @@ def validate(model, dl_test, loss_fn, epoch, writer, args, logger):
             acc = torchmetrics.functional.accuracy(outputs, labels, task='multiclass', num_classes=args.classes)
             total_acc_val += acc
 
-    writer.add_scalar('loss/val', total_loss_val / len(dl_test), epoch)
-    writer.add_scalar('acc/val', total_acc_val / len(dl_test), epoch)
+    total_loss_val = total_loss_val / len(dl_test)
+    total_acc_val = total_acc_val / len(dl_test)
+    writer.add_scalar('loss/val', total_loss_val, epoch)
+    writer.add_scalar('acc/val', total_acc_val, epoch)
     #logger.info('<<<<<<<<<<<<<<<<<<<< Validation Step >>>>>>>>>>>>>>>>>>>>')
     #logger.info(f"Loss: {total_loss_val / len(dl_test):.4f}, Accuracy: {total_acc_val / len(dl_test):.4f}")
     #logger.info('<<<<<<<<<<<<<<<<< End of Validation Step >>>>>>>>>>>>>>>>>')
-    return total_loss_val, total_acc_val
+    return total_acc_val, total_loss_val
 
 
 if __name__ == '__main__':

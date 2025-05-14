@@ -13,3 +13,4 @@ uncert_epochs: 30
 uncert_batch_size: 8192
 resume:
 test_path: mnist_mlp_model_best.pth
+patience: 7

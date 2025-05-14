@@ -13,3 +13,4 @@ uncert_epochs: 30
 uncert_batch_size: 128
 resume:
 test_path: food101_u-net_model_best.pth
+patience: 7

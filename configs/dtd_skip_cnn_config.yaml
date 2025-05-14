@@ -13,3 +13,4 @@ uncert_epochs: 30
 uncert_batch_size: 64
 resume:
 test_path: dtd_resnet-18_model_best.pth
+patience: 7

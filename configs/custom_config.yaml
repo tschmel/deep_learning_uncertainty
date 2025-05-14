@@ -13,3 +13,4 @@ uncert_epochs: 30
 uncert_batch_size: 512
 resume:
 test_path: food101_skip_cnn_model_best.pth
+patience: 7

@@ -130,6 +130,7 @@ def main():
 
 def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):
     best_val_acc = 0
+    epochs_without_improvement = 0
     for epoch in range(args.epochs):
         model.train()
         total_loss = 0
@@ -156,6 +157,13 @@ def train(model, loss_fn, optimizer, writer, dl_train, dl_test, args, logger):
                 best_val_acc = val_acc
                 save_path = './' + args.dataset + '_' + args.model + '_model_best.pth'
                 torch.save(model.state_dict(), save_path)
+                epochs_without_improvement = 0
+            else:
+                epochs_without_improvement += 1
+
+            if epochs_without_improvement >= args.patience:
+                logger.info('Early stopping triggered. ')
+                break
 
 
 def validate(model, dl_test, loss_fn, epoch, writer, args, logger):

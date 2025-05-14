@@ -13,3 +13,4 @@ uncert_epochs: 30
 uncert_batch_size: 2048
 resume:
 test_path: mnist_skip_cnn_model_best.pth
+patience: 7

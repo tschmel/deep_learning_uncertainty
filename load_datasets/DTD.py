@@ -5,15 +5,14 @@ from torch.utils.data import DataLoader
 
 def dtd(args, split):
     train_transform = transforms.Compose([  # original: 300x300 - 640x640
-        transforms.Resize(256),
+        transforms.Resize((256, 256)),
         transforms.RandomCrop(224),
         transforms.ColorJitter(brightness=0.2, contrast=0.2),
-        transforms.ToTensor(),
-        transforms.Normalize([0.5] * 3, [0.5] * 3)
+        transforms.ToTensor()
     ])
     test_transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize(224),  # original: 300x300 - 640x640
+        transforms.Resize((224, 224)),  # original: 300x300 - 640x640
     ])
     dl = None
     if split == 'train':

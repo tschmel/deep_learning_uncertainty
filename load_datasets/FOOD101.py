@@ -5,15 +5,14 @@ from torch.utils.data import DataLoader
 
 def food101(args, split):
     train_transform = transforms.Compose([
-        transforms.Resize(256),  # original: max 512x512
+        transforms.Resize((256, 256)),  # original: max 512x512
         transforms.RandomCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
-        transforms.ToTensor(),
-        transforms.Normalize([0.5] * 3, [0.5] * 3)
+        transforms.ToTensor()
     ])
     test_transform = transforms.Compose([
-        transforms.Resize(224),  # original: max 512x512
+        transforms.Resize((224, 224)),  # original: max 512x512
         transforms.ToTensor(),
     ])
     dl = None

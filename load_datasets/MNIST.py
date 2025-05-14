@@ -6,8 +6,7 @@ from torch.utils.data import DataLoader
 def mnist(args, split):
     train_transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.RandomRotation(10),
-        transforms.Normalize((0.1307,), (0.3081,))
+        transforms.RandomRotation(10)
     ])
     test_transform = transforms.Compose([
         transforms.ToTensor(),

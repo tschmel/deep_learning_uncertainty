@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 def fashion_mnist(args, split):
     train_transform = transforms.Compose([
         transforms.ToTensor(),
+        transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(30)
     ])
     test_transform = transforms.Compose([

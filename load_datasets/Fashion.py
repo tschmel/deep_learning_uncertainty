@@ -4,16 +4,20 @@ from torch.utils.data import DataLoader
 
 
 def fashion_mnist(args, split):
-    transform = transforms.Compose([
+    train_transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((args.img_size, args.img_size)),  # original: 28x28
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(30)
+    ])
+    test_transform = transforms.Compose([
+        transforms.ToTensor()
     ])
     dl = None
     if split == 'train':
-        train_dataset = torchvision.datasets.FashionMNIST(root='../datasets', train=True, transform=transform, download=True)
+        train_dataset = torchvision.datasets.FashionMNIST(root='../datasets', train=True, transform=train_transform, download=True)
         dl = DataLoader(train_dataset, batch_size=args.train_batch_size, shuffle=True)
     elif split == 'test':
-        test_dataset = torchvision.datasets.FashionMNIST(root='../datasets', train=False, transform=transform, download=True)
+        test_dataset = torchvision.datasets.FashionMNIST(root='../datasets', train=False, transform=test_transform, download=True)
         dl = DataLoader(test_dataset, batch_size=args.test_batch_size, shuffle=False)
     return dl
 

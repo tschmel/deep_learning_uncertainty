@@ -5,7 +5,7 @@ img_size: 224
 learning_rate: 0.003
 weight_decay: 0.00005
 classes: 101
-epochs: 100
+epochs: 40
 train_batch_size: 128
 test_batch_size: 512
 val_freq: 1

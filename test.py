@@ -9,6 +9,7 @@ import load_datasets.MNIST
 import load_datasets.Fashion
 import load_datasets.CIFAR10
 import load_datasets.FOOD101
+import load_datasets.Flowers102
 import load_datasets.DTD
 
 
@@ -87,6 +88,9 @@ def main():
     elif args.dataset == 'food101':
         logger.info('FOOD101 dataset selected')
         dl_test = load_datasets.FOOD101.load_food101_test_dataset(args)
+    elif args.dataset == 'flowers102':
+        logger.info('Flowers102 dataset selected')
+        dl_test = load_datasets.Flowers102.load_flowers102_test_dataset(args)
     elif args.dataset == 'dtd':
         logger.info('DTD dataset selected')
         dl_test = load_datasets.DTD.load_dtd_test_dataset(args)

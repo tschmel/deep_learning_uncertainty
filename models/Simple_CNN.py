@@ -2,7 +2,7 @@ import torch.nn as nn
 
 
 class Simple_CNN(nn.Module):
-    def __init__(self, feat_dim, img_size, classes):
+    def __init__(self, feat_dim, classes):
         super(Simple_CNN, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=feat_dim, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
@@ -26,5 +26,5 @@ class Simple_CNN(nn.Module):
 
 
 def create_simple_cnn_model(args):
-    model = Simple_CNN(feat_dim=args.feat_dim, img_size=int(args.img_size), classes=args.classes)
+    model = Simple_CNN(feat_dim=args.feat_dim, classes=args.classes)
     return model

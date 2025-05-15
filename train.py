@@ -14,6 +14,7 @@ import load_datasets.MNIST
 import load_datasets.Fashion
 import load_datasets.CIFAR10
 import load_datasets.FOOD101
+import load_datasets.Flowers102
 import load_datasets.DTD
 
 from test import test
@@ -111,6 +112,11 @@ def main():
         dl_train = load_datasets.FOOD101.load_food101_train_dataset(args)
         dl_val = load_datasets.FOOD101.load_food101_test_dataset(args)
         dl_test = load_datasets.FOOD101.load_food101_test_dataset(args)
+    elif args.dataset == 'flowers102':
+        logger.info('Flowers102 dataset selected')
+        dl_train = load_datasets.Flowers102.load_flowers102_train_dataset(args)
+        dl_val = load_datasets.Flowers102.load_flowers102_val_dataset(args)
+        dl_test = load_datasets.Flowers102.load_flowers102_test_dataset(args)
     elif args.dataset == 'dtd':
         logger.info('DTD dataset selected')
         dl_train = load_datasets.DTD.load_dtd_train_dataset(args)

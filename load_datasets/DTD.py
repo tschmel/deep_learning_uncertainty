@@ -4,9 +4,8 @@ from torch.utils.data import DataLoader
 
 
 def dtd(args, split):
-    train_transform = transforms.Compose([  # original: 300x300 - 640x640
-        transforms.Resize((256, 256)),
-        transforms.RandomCrop(224),
+    train_transform = transforms.Compose([
+        transforms.Resize((224, 224)),  # original: 300x300 - 640x640
         transforms.ColorJitter(brightness=0.2, contrast=0.2),
         transforms.ToTensor()
     ])

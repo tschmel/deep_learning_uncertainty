@@ -17,7 +17,7 @@ def flowers102(args, split):
     ])
     dl = None
     if split == 'train':
-        train_dataset = torchvision.datasets.Flowers102(root='../datasets', split='train', transform=train_transform, download=True)
+        train_dataset = torchvision.datasets.Flowers102(root='../datasets', split='train', transform=test_transform, download=True)
         dl = DataLoader(train_dataset, batch_size=args.train_batch_size, shuffle=True)
     elif split == 'val':
         val_dataset = torchvision.datasets.Flowers102(root='../datasets', split='val', transform=test_transform, download=True)

@@ -71,11 +71,11 @@ class DownSampleResNetBlock(nn.Module):
     def __init__(self, in_feat_dim, out_feat_dim):
         super(DownSampleResNetBlock, self).__init__()
         self.batch_norm1 = nn.BatchNorm2d(num_features=in_feat_dim)
-        self.conv1 = nn.Conv2d(in_channels=in_feat_dim, out_channels=out_feat_dim, kernel_size=3, stride=2, padding=0)
+        self.conv1 = nn.Conv2d(in_channels=in_feat_dim, out_channels=out_feat_dim, kernel_size=3, stride=2, padding=1)
         self.batch_norm2 = nn.BatchNorm2d(num_features=out_feat_dim)
         self.conv2 = nn.Conv2d(in_channels=out_feat_dim, out_channels=out_feat_dim, kernel_size=3, stride=1, padding=1)
         self.batch_norm3 = nn.BatchNorm2d(num_features=in_feat_dim)
-        self.conv3 = nn.Conv2d(in_channels=in_feat_dim, out_channels=out_feat_dim, kernel_size=3, stride=2, padding=0)
+        self.conv3 = nn.Conv2d(in_channels=in_feat_dim, out_channels=out_feat_dim, kernel_size=3, stride=2, padding=1)
 
     def forward(self, x):
         skip = x

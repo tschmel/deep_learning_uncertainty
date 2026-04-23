@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 def cifar10(args, split):
     train_transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.RandomCrop(32, padding=2),
+        transforms.RandomCrop(32),
         transforms.RandomHorizontalFlip(),
         transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1)
     ])

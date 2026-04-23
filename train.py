@@ -16,6 +16,7 @@ import load_datasets.CIFAR10
 import load_datasets.FOOD101
 import load_datasets.Flowers102
 import load_datasets.DTD
+import load_datasets.Imagenette
 
 from test import test
 from test import create_logger as test_logger
@@ -125,6 +126,11 @@ def main():
         dl_train = load_datasets.DTD.load_dtd_train_dataset(args)
         dl_val = load_datasets.DTD.load_dtd_val_dataset(args)
         dl_test = load_datasets.DTD.load_dtd_test_dataset(args)
+    elif args.dataset == 'imagenette':
+        logger.info('Imagenette dataset selected')
+        dl_train = load_datasets.Imagenette.load_imagenette_train_dataset(args)
+        dl_val = load_datasets.Imagenette.load_imagenette_val_dataset(args)
+        dl_test = load_datasets.Imagenette.load_imagenette_test_dataset(args)
     else:
         logger.error('Dataset not supported!')
 

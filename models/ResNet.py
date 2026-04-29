@@ -1,4 +1,5 @@
 import torch.nn as nn
+from torchvision.models import resnet18
 
 
 class Stage1_BottleNeckBlock(nn.Module):
@@ -196,4 +197,11 @@ def create_resnet_101_model(args):
 
 def create_resnet_152_model(args):
     model = ResNet(num_blocks_per_stage=[3, 8, 36, 3], bottle_neck=True, feat_dim=args.feat_dim, classes=args.classes)
+    return model
+
+
+def load_literature_resnet18(args):
+    model = resnet18(weights=None)
+    num_feat = model.fc.in_features
+    model.fc = nn.Linear(num_feat, args.classes)
     return model

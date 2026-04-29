@@ -12,6 +12,8 @@ import load_datasets.CIFAR10
 import load_datasets.FOOD101
 import load_datasets.Flowers102
 import load_datasets.DTD
+import load_datasets.Imagenette
+import load_datasets.Imagewoof
 
 
 def get_parser():
@@ -48,6 +50,9 @@ def main():
     elif args.model == 'larger_cnn':
         from models.Larger_CNN import create_larger_cnn_model as Model
         logger.info('Larger_CNN model architecture selected')
+    elif args.model == 'literature_resnet-18':
+        from models.ResNet import load_literature_resnet18 as Model
+        logger.info('Literature ResNet-18 model architecture selected')
     elif args.model == 'resnet-18':
         from models.ResNet import create_resnet_18_model as Model
         logger.info('ResNet-18 model architecture selected')
@@ -97,6 +102,12 @@ def main():
     elif args.dataset == 'dtd':
         logger.info('DTD dataset selected')
         dl_test = load_datasets.DTD.load_dtd_test_dataset(args)
+    elif args.dataset == 'imagenette':
+        logger.info('Imagenette dataset selected')
+        dl_test = load_datasets.Imagenette.load_imagenette_test_dataset(args)
+    elif args.dataset == 'imagewoof':
+        logger.info('Imagewoof dataset selected')
+        dl_test = load_datasets.Imagewoof.load_imagewoof_test_dataset(args)
     else:
         logger.error('Dataset not supported!')
     calculate_uncertainty(model, dl_test, args, logger)

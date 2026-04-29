@@ -1,4 +1,3 @@
-import os
 import argparse
 import yaml
 import logging
@@ -17,6 +16,7 @@ import load_datasets.FOOD101
 import load_datasets.Flowers102
 import load_datasets.DTD
 import load_datasets.Imagenette
+import load_datasets.Imagewoof
 
 from test import test
 from test import create_logger as test_logger
@@ -58,6 +58,9 @@ def main():
     elif args.model == 'larger_cnn':
         from models.Larger_CNN import create_larger_cnn_model as Model
         logger.info('Larger_CNN model architecture selected')
+    elif args.model == 'literature_resnet-18':
+        from models.ResNet import load_literature_resnet18 as Model
+        logger.info('Literature ResNet-18 model architecture selected')
     elif args.model == 'resnet-18':
         from models.ResNet import create_resnet_18_model as Model
         logger.info('ResNet-18 model architecture selected')
@@ -131,6 +134,11 @@ def main():
         dl_train = load_datasets.Imagenette.load_imagenette_train_dataset(args)
         dl_val = load_datasets.Imagenette.load_imagenette_val_dataset(args)
         dl_test = load_datasets.Imagenette.load_imagenette_test_dataset(args)
+    elif args.dataset == 'imagewoof':
+        logger.info('Imagewoof dataset selected')
+        dl_train = load_datasets.Imagewoof.load_imagewoof_train_dataset(args)
+        dl_val = load_datasets.Imagewoof.load_imagewoof_val_dataset(args)
+        dl_test = load_datasets.Imagewoof.load_imagewoof_test_dataset(args)
     else:
         logger.error('Dataset not supported!')
 
